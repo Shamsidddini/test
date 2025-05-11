@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shams App</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Welcome to Shams App</h1>
+    <p><strong>Current Date and Time:</strong> {{ current_time }}</p>
+    <div class="totals">
+        <p><strong>Total Income:</strong> ${{ income }}</p>
+        <p><strong>Total Expenses:</strong> ${{ expenses }}</p>
+        <p><strong>Net Balance:</strong> ${{ income - expenses }}</p>
+    </div>
+
+    <div class="actions">
+        <a href="/add_income"><button>Add Income</button></a>
+        <a href="/add_expense"><button>Add Expense</button></a>
+        <form action="/reset" method="POST" style="display:inline;">
+            <button type="submit" style="background-color: red; color: white;">Reset for New Month</button>
+        </form>
+        <a href="/generate_pdf"><button style="background-color: green; color: white;">Generate PDF Report</button></a>
+        <a href="/qrcode" target="_blank"><button style="background-color: purple; color: white;">View QR Code</button></a>
+    </div>
+
+    <h2>Expenses Visualization</h2>
+    <canvas id="expensesChart" width="400" height="400"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('expensesChart').getContext('2d');
+
+            // Dynamic data passed from Flask (converted from Python dictionary to JSON-like object)
+            const expenseData = {{ expense_data | tojson }};
+
+            // Prepare data for Chart.js
+            const labels = Object.keys(expenseData); // Categories
+            const data = Object.values(expenseData); // Amounts
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Expenses',
+                        data: data,
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (tooltipItem) => {
+                                    return `${tooltipItem.label}: $${tooltipItem.raw}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+<button id="toggle-dark-mode">Toggle Dark Mode</button>
+<script>
+    const button = document.getElementById('toggle-dark-mode');
+    button.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const isDarkMode = document.body.classList.contains('dark');
+        localStorage.setItem('darkMode', isDarkMode);
+    });
+
+    // Load the preference
+    document.addEventListener('DOMContentLoaded', () => {
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        if (darkMode) {
+            document.body.classList.add('dark');
+        }
+    });
+</script>
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/service-worker.js')
+            .then((registration) => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
+</script><script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/service-worker.js')
+            .then((registration) => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
+</script>

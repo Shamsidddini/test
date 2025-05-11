@@ -1,0 +1,14 @@
+
+flask
+matplotlib
+pandas
+reportlab
+flask
+matplotlib
+pandas
+reportlab
+flask
+matplotlib
+pandas
+reportlab
+qrcode
